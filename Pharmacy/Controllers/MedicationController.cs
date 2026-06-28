@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Pharmacy.Database;
 
 namespace Pharmacy.Controllers;
@@ -7,25 +8,32 @@ namespace Pharmacy.Controllers;
 [Route("[controller]")]
 public class MedicationController : ControllerBase
 {
+    private readonly PharmacyDbContext _context;
+
+    public MedicationController(PharmacyDbContext context)
+    {
+        _context = context;
+    }
+
     [HttpGet]
-        public IActionResult Get()
+    public async Task<IActionResult> Get()
+    {
+        var medications = await _context.Medication.ToListAsync();
+        return Ok(medications);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var medication = await _context.Medication.FirstOrDefaultAsync(m => m.Id == id);
+
+        if (medication == null)
         {
-            var medications = MedicationData.Medications;
-            return Ok(medications);
+            return NotFound(new { message = $"Medication with ID {id} not found." });
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)
-        {
-            var medication = MedicationData.Medications.FirstOrDefault(m => m.Id == id);
-            
-            if (medication == null)
-            {
-                return NotFound(new { message = $"Medication with ID {id} not found." });
-            }
-
-            return Ok(medication);
-        }
+        return Ok(medication);
+    }
 }
 
 
