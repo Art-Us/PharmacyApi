@@ -3,10 +3,11 @@ using Pharmacy.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-
 builder.Services.AddControllers();
 
+
+builder.Services.AddDbContext<PharmacyDbContext>(options =>
+    options.UseSqlite("Data Source=Database//Pharmacy.db"));
 
 builder.Services.AddCors(options =>
 {
@@ -23,7 +24,6 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -31,7 +31,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 
 app.UseCors("AllowAngular");
 
